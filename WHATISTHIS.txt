@@ -1,0 +1,11 @@
+This is a fork of TuxPaint, a source is _unstable_.
+It was taken on March 9th, 2013 from CVS.
+
+Plase consider this repo is _NOT_ an official repository of TuxPaint - they use CVS.
+
+TuxPaint ( incl. sources ) can be found here: http://tuxpaint.org
+
+-----------------
+
+In case of questions do not hesitate to contact me at foo-script REPLACE-THIS-WITH-@ o2.pl
+
