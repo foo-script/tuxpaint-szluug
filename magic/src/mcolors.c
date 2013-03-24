@@ -1,13 +1,15 @@
 /*
   mcolors.c
-	
-  Calligraphy Magic Tool Plugin
+
+  Changes a color of all objects on the screen
   Tux Paint - A simple drawing program for children.
 
   Copyright (c) 2002-2008 by Bill Kendrick and others; see AUTHORS.txt
   bill@newbreedsoftware.com
   http://www.tuxpaint.org/
-
+  
+  Copyright (c) 2013 by Lukasz Dmitrowski
+  
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
   the Free Software Foundation; either version 2 of the License, or
@@ -39,7 +41,7 @@ enum {
 };
 
 const char * snd_filenames[NUM_TOOLS] = {
-  "one.wav",
+  "mcolors.wav",
 };
 
 const char * icon_filenames[NUM_TOOLS] = {
@@ -82,10 +84,7 @@ int mcolors_init(magic_api * api)
     snprintf(fname, sizeof(fname),
              "%s/sounds/magic/%s",
 	     api->data_directory, snd_filenames[i]);
-
     printf("Trying to load %s sound file\n", fname);
-
-
     snd_effect[i] = Mix_LoadWAV(fname);
   }
 
@@ -103,9 +102,6 @@ SDL_Surface * mcolors_get_icon(magic_api * api, int which)
 
   snprintf(fname, sizeof(fname), "%s/images/magic/%s.png",
 	     api->data_directory, icon_filenames[which]);
-
-
-
   return(IMG_Load(fname));
 }
 
@@ -115,9 +111,7 @@ char * mcolors_get_name(magic_api * api, int which)
   const char * our_name_localized;
 
   our_name_english = names[which];
-
   our_name_localized = gettext(our_name_english);
-
   return(strdup(our_name_localized));
 }
 
@@ -166,12 +160,11 @@ void do_mcolors(void * ptr, SDL_Surface * canvas, SDL_Surface * snapshot,int x, 
 		for(int x=0;x<canvas->w;x++)
 		{		
 			pixel = api->getpixel(canvas,x,y);
-			SDL_GetRGB(pixel,canvas->format,&r,&g,&b); // for v parameter
+			SDL_GetRGB(pixel,canvas->format,&r,&g,&b);
 			api->rgbtohsv(r,g,b,&h,&s,&v);
 			if (r==255 && g==255 && b==255) continue;
 			h = h_col;
 			s = s_col;
-			v_col = v;
 			if (mcolors_r==0 && mcolors_g==0 &&mcolors_b==0){
 				v += 50;
 			 }
@@ -184,9 +177,6 @@ void do_mcolors(void * ptr, SDL_Surface * canvas, SDL_Surface * snapshot,int x, 
 			else if (mcolors_r==255 && mcolors_g==255 && mcolors_b==255){
 				 v -= 50;
 			 }
-			else{
-				h = h_col;
-			}
 			api->hsvtorgb(h,s,v,&r,&g,&b);
 			pixel = SDL_MapRGB(canvas->format,r,g,b);
 			api->putpixel(canvas,x,y,pixel);
@@ -197,22 +187,13 @@ void mcolors_click(magic_api * api, int which, int mode,
 	           SDL_Surface * canvas, SDL_Surface * snapshot,
 	           int x, int y, SDL_Rect * update_rect)
 {
-  mcolors_drag(api, which, canvas, snapshot, x, y, x, y, update_rect);
+	do_mcolors(api,canvas,snapshot,x,y);
 }
 
 void mcolors_drag(magic_api * api, int which, SDL_Surface * canvas,
 	          SDL_Surface * snapshot, int ox, int oy, int x, int y,
 		  SDL_Rect * update_rect)
 {
- do_mcolors(api,canvas,snapshot,x,y);
- update_rect->x = 0;
- update_rect->y = 0;
- update_rect->w = canvas->w;
- update_rect->h = canvas->h;
-
- api->playsound(snd_effect[which],
-                 (x * 255) / canvas->w, 
-                 	         255);
 }
 
 void mcolors_release(magic_api * api, int which,
